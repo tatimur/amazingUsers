@@ -1,4 +1,4 @@
-# vue-test
+# amazing users
 
 > A Vue.js project
 
