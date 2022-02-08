@@ -24,7 +24,7 @@
           <el-input v-model='form.name' autocomplete='off'></el-input>
         </el-form-item>
         <el-form-item label='Телефон' :label-width='formLabelWidth'>
-          <el-input v-model='form.phone' type="number" autocomplete='off'></el-input>
+          <el-input v-model='form.phone' v-mask="'+# ### ### ## ##'" placeholder="79999999999" type="tel" autocomplete='off'></el-input>
         </el-form-item>
         <el-form-item label='Начальник' :label-width='formLabelWidth'>
           <el-select v-model='form.lead' placeholder='Выбрать из списка'>
@@ -40,7 +40,7 @@
       </el-form>
       <span slot='footer' class='dialog-footer'>
         <el-button type="danger" round @click='cancelForm()'>Отмена</el-button>
-        <el-button type="success" round @click='addUser()'>Добавить</el-button>
+        <el-button type="success" round @click='addUser()' :disabled='disabledBtn()'>Добавить</el-button>
       </span>
     </el-dialog>
   </div>
@@ -49,7 +49,7 @@
 <script>
 export default {
   name: 'usersTable',
-  data() {
+  data () {
     return {
       allUsers: [],
       dialogTableVisible: false,
@@ -57,7 +57,7 @@ export default {
       form: {
         name: null,
         phone: null,
-        lead: null,
+        lead: null
       },
       formLabelWidth: '120px',
       users: [
@@ -65,13 +65,13 @@ export default {
           id: 1,
           name: 'Марина',
           phone: '+ 7 909 951 28 81',
-          children: [],
+          children: []
         },
         {
           id: 2,
           name: 'Петр',
           phone: '+ 7 909 951 28 85',
-          children: [],
+          children: []
         },
         {
           id: 3,
@@ -82,33 +82,39 @@ export default {
               id: 31,
               name: 'Денис',
               phone: '+ 7 909 951 28 84',
-              children: [],
+              children: []
             },
             {
               id: 32,
               name: 'Алина',
               phone: '+ 7 909 951 28 86',
-              children: [],
-            },
-          ],
+              children: []
+            }
+          ]
         },
         {
           id: 4,
           name: 'Иван',
           phone: '+ 7 909 951 28 89',
-          children: [],
-        },
-      ],
-    };
+          children: []
+        }
+      ]
+    }
+  },
+  created () {
+    this.users = JSON.parse(localStorage.getItem('users')) || this.users
   },
   methods: {
-    addUser() {
+    disabledBtn () {
+      return !this.form.name || !this.form.phone
+    },
+    addUser () {
       if (this.form.lead === null) {
         this.users.push({
           id: this.$uuid.v4(),
           name: this.form.name,
           phone: this.form.phone,
-          children: [],
+          children: []
         })
         this.saveUsersToLocal()
         this.cancelForm()
@@ -116,39 +122,36 @@ export default {
         this.addUserToChildrenArray(this.users)
       }
     },
- 
-    cancelForm() {
+    cancelForm () {
       this.dialogFormVisible = false
       this.allUsers = []
       this.form.name = null
       this.form.phone = null
       this.form.lead = null
     },
-
-    addUserToChildrenArray(users) {
+    addUserToChildrenArray (users) {
       let formUserId = this.form.lead
       let childrenUser = {
         id: this.$uuid.v4(),
         name: this.form.name,
         phone: this.form.phone,
-        children: [],
+        children: []
       }
       users.forEach(user => this.addToChildren(user, formUserId, childrenUser))
       this.saveUsersToLocal()
       this.cancelForm()
     },
 
-    addToChildren(user, userleadId, userAdd) {
+    addToChildren (user, userleadId, userAdd) {
       if (user.id === userleadId) {
         user.children.push(userAdd)
       } else {
         if (user.children.length > 0) {
-          user.children.forEach(item => this.addToChildren(item, userleadId, userAdd)) 
+          user.children.forEach(item => this.addToChildren(item, userleadId, userAdd))
         }
       }
     },
-
-    getAllUsers(users) {
+    getAllUsers (users) {
       users.forEach((item) => {
         this.allUsers.push({
           id: item.id,
